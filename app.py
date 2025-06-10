@@ -1,18 +1,19 @@
 from flask import Flask, render_template, request
 import pickle
 import numpy as np
+import os
 
 app = Flask(__name__)
 
-with open("house_pred.pkl","rb") as f :
-    model=pickle.load(f);
+with open("house_pred.pkl", "rb") as f:
+    model = pickle.load(f)
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/predict',methods = ['POST'])
-def predict() :
+@app.route('/predict', methods=['POST'])
+def predict():
     features = [
         float(request.form['CRIM']),
         float(request.form['ZN']),
@@ -31,9 +32,10 @@ def predict() :
 
     features_array = np.array([features])
     prediction = model.predict(features_array)
-    output = round(prediction[0],2)
+    output = round(prediction[0], 2)
 
-    return render_template('index.html',prediction_text=f"Predicted price : {output}")
+    return render_template('index.html', prediction_text=f"Predicted price: {output}")
 
-if __name__ == __name__:
-    app.run(debug=True)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
